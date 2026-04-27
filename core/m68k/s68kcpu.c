@@ -110,6 +110,7 @@ unsigned int s68k_get_reg(m68k_register_t regnum)
     case M68K_REG_A6:  return m68ki_cpu.dar[14];
     case M68K_REG_A7:  return m68ki_cpu.dar[15];
     case M68K_REG_PC:  return MASK_OUT_ABOVE_32(m68ki_cpu.pc);
+    case M68K_REG_PPC:  return MASK_OUT_ABOVE_32(m68ki_cpu.prev_pc);
     case M68K_REG_SR:  return  m68ki_cpu.t1_flag        |
                   (m68ki_cpu.s_flag << 11)              |
                    m68ki_cpu.int_mask                   |
@@ -150,7 +151,7 @@ void s68k_set_reg(m68k_register_t regnum, unsigned int value)
     case M68K_REG_A5:  REG_A[5] = MASK_OUT_ABOVE_32(value); return;
     case M68K_REG_A6:  REG_A[6] = MASK_OUT_ABOVE_32(value); return;
     case M68K_REG_A7:  REG_A[7] = MASK_OUT_ABOVE_32(value); return;
-    case M68K_REG_PC:  m68ki_jump(MASK_OUT_ABOVE_32(value)); return;
+    case M68K_REG_PC:  REG_PC = MASK_OUT_ABOVE_32(value); return;
     case M68K_REG_SR:  m68ki_set_sr(value); return;
     case M68K_REG_SP:  REG_SP = MASK_OUT_ABOVE_32(value); return;
     case M68K_REG_USP:  if(FLAG_S)
@@ -336,10 +337,9 @@ void s68k_pulse_reset(void)
 #endif /* M68K_EMULATE_PREFETCH */
 
   /* Read the initial stack pointer and program counter */
-  m68ki_jump(0);
+  REG_PC = 0;
   REG_SP = m68ki_read_imm_32();
   REG_PC = m68ki_read_imm_32();
-  m68ki_jump(REG_PC);
 
 #if M68K_EMULATE_ADDRESS_ERROR
   CPU_RUN_MODE = RUN_MODE_NORMAL;

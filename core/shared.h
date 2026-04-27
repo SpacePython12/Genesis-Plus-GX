@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
+
 
 #include "types.h"
 #include "osd.h"
@@ -36,6 +36,7 @@
 #include "areplay.h"
 #include "svp.h"
 #include "state.h"
+#include "zlib.h"
 
 #endif /* _SHARED_H_ */
 

@@ -1137,12 +1137,20 @@ INLINE uint m68ki_pull_32(void)
 INLINE void m68ki_jump(uint new_pc)
 {
   REG_PC = new_pc;
+#ifdef HOOK_CPU
+  if (UNLIKELY(cpu_hook))
+    cpu_hook(HOOK_M68K_JMP, 0, REG_PC, 0);
+#endif
 }
 
 INLINE void m68ki_jump_vector(uint vector)
 {
   m68ki_use_data_space() /* auto-disable (see m68kcpu.h) */
   REG_PC = m68ki_read_32(vector<<2);
+#ifdef HOOK_CPU
+  if (UNLIKELY(cpu_hook))
+    cpu_hook(HOOK_M68K_VJMP, 0, REG_PC, vector);
+#endif
 }
 
 
@@ -1154,16 +1162,28 @@ INLINE void m68ki_jump_vector(uint vector)
 INLINE void m68ki_branch_8(uint offset)
 {
   REG_PC += MAKE_INT_8(offset);
+#ifdef HOOK_CPU
+  if (UNLIKELY(cpu_hook))
+    cpu_hook(HOOK_M68K_JMP, 1, REG_PC, 0);
+#endif
 }
 
 INLINE void m68ki_branch_16(uint offset)
 {
   REG_PC += MAKE_INT_16(offset);
+#ifdef HOOK_CPU
+  if (UNLIKELY(cpu_hook))
+    cpu_hook(HOOK_M68K_JMP, 2, REG_PC, 0);
+#endif
 }
 
 INLINE void m68ki_branch_32(uint offset)
 {
   REG_PC += offset;
+#ifdef HOOK_CPU
+  if (UNLIKELY(cpu_hook))
+    cpu_hook(HOOK_M68K_JMP, 4, REG_PC, 0);
+#endif
 }
 
 
@@ -1425,7 +1445,15 @@ INLINE void m68ki_exception_interrupt(uint int_level)
   /* Generate a stack frame */
   m68ki_stack_frame_3word(REG_PC, sr);
 
-  m68ki_jump(new_pc);
+  // Was originally this:
+  // m68ki_jump(new_pc);
+  // To avoid triggering the regular jump handler, we set the program counter manually:
+  REG_PC = new_pc;
+  // ...and manually trigger the exception jump handler instead.
+#ifdef HOOK_CPU
+  if (UNLIKELY(cpu_hook))
+    cpu_hook(HOOK_M68K_VJMP, 0, REG_PC, vector);
+#endif
 
   /* Update cycle count now */
   USE_CYCLES(m68ki_cycle_interrupts[(m68ki_cpu.cycles / MUL) % 10]);

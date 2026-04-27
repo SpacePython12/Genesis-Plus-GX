@@ -208,6 +208,7 @@ typedef enum
   M68K_REG_SP,    /* The current Stack Pointer (located in A7) */
   M68K_REG_USP,   /* User Stack Pointer */
   M68K_REG_ISP,   /* Interrupt Stack Pointer */
+  M68K_REG_PPC,
 
 #if M68K_EMULATE_PREFETCH
   /* Assumed registers */

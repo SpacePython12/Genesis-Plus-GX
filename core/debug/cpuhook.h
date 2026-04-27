@@ -75,17 +75,21 @@ typedef enum {
   // REGS
   HOOK_VDP_REG  = (1 << 12),
   HOOK_M68K_REG = (1 << 13),
+
+  // PROGRAM FLOW
+  HOOK_M68K_JMP = (1 << 14),
+  HOOK_M68K_VJMP = (1 << 15),
 } hook_type_t;
 
 
 /* CPU hook is called on read, write, and execute.
  */
-void (*cpu_hook)(hook_type_t type, int width, unsigned int address, unsigned int value);
+extern void (*cpu_hook)(hook_type_t type, int width, unsigned int address, unsigned int value);
 
 /* Use set_cpu_hook() to assign a callback that can process the data provided
  * by cpu_hook().
  */
-void set_cpu_hook(void(*hook)(hook_type_t type, int width, unsigned int address, unsigned int value));
+extern void set_cpu_hook(void(*hook)(hook_type_t type, int width, unsigned int address, unsigned int value));
 
 
 #endif /* _CPUHOOK_H_ */

@@ -38,6 +38,7 @@
 
 #include "shared.h"
 #include "flash_cfi.h"
+#include <zlib.h>
 
 T_SRAM sram;
 
